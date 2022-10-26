@@ -1,6 +1,16 @@
 {
   "name": "vnc-viewer",
-  "description": "",
+  "description": "VNC Viewer for fulib.org",
+  "publisher": "fulib",
+  "author": {
+    "name": "Adrian Kunz",
+    "email": "a.kunz@uni-kassel.de",
+    "url": "https://fulib.org"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sekassel-research/vscode-vnc-viewer.git"
+  },
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.66.2"
