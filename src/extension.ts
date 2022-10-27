@@ -35,65 +35,65 @@ const WEBVIEW_CONTENT = `<!DOCTYPE html>
 </body>
 </html>`;
 
-let vncUrl: string;
 let currentPanel: vscode.WebviewPanel | undefined
 
+async function getVncUrl(): Promise<string | undefined> {
+	if (!vscode.workspace.workspaceFolders) {
+		return undefined;
+	}
+	// e.g. /home/coder/project
+	let homePath = vscode.workspace.workspaceFolders[0].uri.fsPath;
+	let vncPath = homePath + '/.vnc/vncUrl';
+	let fileBuffer: any = await fs.promises.readFile(vncPath).catch(async (err) => {
+		console.log(err);
+	});
+	return fileBuffer.toString();
+}
+
 export async function activate(context: vscode.ExtensionContext) {
-	if (vscode.workspace.workspaceFolders !== undefined) {
-		//  /home/coder/project
-		let homePath = vscode.workspace.workspaceFolders[0].uri.fsPath;
-		let vncPath = homePath + '/.vnc/vncUrl';
-		let fileBuffer: any = await fs.promises.readFile(vncPath).catch(async (err) => {
-			console.log(err);
-		});
-		vncUrl = fileBuffer.toString();
-	}
-	else {
-		let message = "Working folder not found, open a folder an try again";
-		vscode.window.showErrorMessage(message);
-		vncUrl = 'http://localhost:13147/containers-vnc/772a8e3a27b9/vnc_lite.html?path=containers-vnc/772a8e3a27b9&resize=remote';
-	}
-
-
-	let disposable = vscode.commands.registerCommand('vnc-viewer.start', () => {
-		// The code you place here will be executed every time your command is executed
-
+	context.subscriptions.push(vscode.commands.registerCommand('vnc-viewer.start', async () => {
 		if (currentPanel) {
 			currentPanel.reveal();
-		} else {
-			currentPanel = vscode.window.createWebviewPanel(
-				'vncView',
-				'vnc viewer',
-				vscode.ViewColumn.One,
-				{
-					enableScripts: true,
-				}
-			);
-			const webview = currentPanel.webview;
-			webview.html = WEBVIEW_CONTENT;
-			webview.postMessage({ vncUrl });
-
-			// Reset when the current panel is closed
-			currentPanel.onDidDispose( () => {
-				currentPanel = undefined;
-			});
-
-			//send the vncUrl when state changes and the panel is active (in foreground)
-			currentPanel.onDidChangeViewState((e) => {
-				if (e.webviewPanel.active) {
-					webview.postMessage({ vncUrl });
-				}
-			});
+			return;
 		}
-	});
+		const vncUrl = await getVncUrl();
+		if (!vncUrl) {
+			vscode.window.showErrorMessage('Working folder not found, open a folder and try again');
+			return;
+		}
 
-	context.subscriptions.push(disposable);
+		currentPanel = vscode.window.createWebviewPanel(
+			'vncView',
+			'vnc viewer',
+			vscode.ViewColumn.One,
+			{
+				enableScripts: true,
+			}
+		);
+		const webview = currentPanel.webview;
+		webview.html = WEBVIEW_CONTENT;
+		webview.postMessage({ vncUrl });
+
+		// Reset when the current panel is closed
+		currentPanel.onDidDispose(() => currentPanel = undefined);
+
+		//send the vncUrl when state changes and the panel is active (in foreground)
+		currentPanel.onDidChangeViewState(e => {
+			if (e.webviewPanel.active) {
+				webview.postMessage({ vncUrl });
+			}
+		});
+	}));
 
 	//add command for opening external browser window
-	context.subscriptions.push(vscode.commands.registerCommand('vnc-viewer.openExternal', () => {
+	context.subscriptions.push(vscode.commands.registerCommand('vnc-viewer.openExternal', async () => {
+		const vncUrl = await getVncUrl();
+		if (!vncUrl) {
+			vscode.window.showErrorMessage('Working folder not found, open a folder and try again');
+			return;
+		}
 		vscode.env.openExternal(vscode.Uri.parse(vncUrl));
 	}));
 }
 
-// this method is called when your extension is deactivated
 export function deactivate() { }
