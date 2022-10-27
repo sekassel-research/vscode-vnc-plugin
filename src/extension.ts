@@ -3,22 +3,42 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 
-let _extensionUri: vscode.Uri;
-let _webview: vscode.Webview;
-let _vncUrl: string;
+const WEBVIEW_CONTENT = `<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
 
+<body>
+	<script>
+		const offsetWidth = 40;
+		const offsetHeight = 20;
 
+		function buildIframe(vncUrl) {
+			let iframe = document.createElement('iframe');
+			iframe.width = window.innerWidth - offsetWidth;
+			iframe.height = window.innerHeight - offsetHeight;
+			iframe.style.border = 'none';
+			iframe.src = vncUrl;
+			document.body.append(iframe);
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
+			//resize our vnc window to the vs code webview
+			window.onresize = () => {
+				iframe.width = window.innerWidth - offsetWidth;
+				iframe.height = window.innerHeight - offsetHeight;
+			};
+		}
+
+		window.addEventListener('message', event => buildIframe(event.data.vncUrl));
+	</script>
+</body>
+</html>`;
+
+let vncUrl: string;
+let currentPanel: vscode.WebviewPanel | undefined
+
 export async function activate(context: vscode.ExtensionContext) {
-	_extensionUri = context.extensionUri;
-	let currentPanel: vscode.WebviewPanel | undefined = undefined;
-
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	// console.log('Congratulations, your extension "helloworld" is now active!');
-
 	if (vscode.workspace.workspaceFolders !== undefined) {
 		//  /home/coder/project
 		let homePath = vscode.workspace.workspaceFolders[0].uri.fsPath;
@@ -26,17 +46,15 @@ export async function activate(context: vscode.ExtensionContext) {
 		let fileBuffer: any = await fs.promises.readFile(vncPath).catch(async (err) => {
 			console.log(err);
 		});
-		_vncUrl = fileBuffer.toString();
+		vncUrl = fileBuffer.toString();
 	}
 	else {
 		let message = "Working folder not found, open a folder an try again";
 		vscode.window.showErrorMessage(message);
+		vncUrl = 'http://localhost:13147/containers-vnc/772a8e3a27b9/vnc_lite.html?path=containers-vnc/772a8e3a27b9&resize=remote';
 	}
 
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
 	let disposable = vscode.commands.registerCommand('vnc-viewer.start', () => {
 		// The code you place here will be executed every time your command is executed
 
@@ -51,9 +69,9 @@ export async function activate(context: vscode.ExtensionContext) {
 					enableScripts: true,
 				}
 			);
-			_webview = currentPanel.webview;
-			_webview.postMessage({ vncUrl: _vncUrl });
-			_webview.html = getWebviewContent();
+			const webview = currentPanel.webview;
+			webview.html = WEBVIEW_CONTENT;
+			webview.postMessage({ vncUrl });
 
 			// Reset when the current panel is closed
 			currentPanel.onDidDispose( () => {
@@ -63,45 +81,19 @@ export async function activate(context: vscode.ExtensionContext) {
 			//send the vncUrl when state changes and the panel is active (in foreground)
 			currentPanel.onDidChangeViewState((e) => {
 				if (e.webviewPanel.active) {
-					_webview.postMessage({ vncUrl: _vncUrl });
+					webview.postMessage({ vncUrl });
 				}
 			});
 		}
-
 	});
 
 	context.subscriptions.push(disposable);
 
 	//add command for opening external browser window
 	context.subscriptions.push(vscode.commands.registerCommand('vnc-viewer.openExternal', () => {
-		vscode.env.openExternal(vscode.Uri.parse(_vncUrl));
+		vscode.env.openExternal(vscode.Uri.parse(vncUrl));
 	}));
-
-
 }
-
-function getWebviewContent(): string {
-
-	return `<!DOCTYPE html>
-	<html>
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	</head>
-
-	<body>
-    	<script type="module" crossorigin="anonymous" src="${getResource(['media', 'main.js'])}"></script>
-	</body>
-	</html>`;
-}
-
-function getResource(pathSegments: string[]): vscode.Uri {
-	// Local path to main script run in the webview
-	const resourcePath = vscode.Uri.joinPath(_extensionUri, ...pathSegments);
-	// And the uri we use to load this script in the webview
-	return _webview.asWebviewUri(resourcePath);
-}
-
 
 // this method is called when your extension is deactivated
 export function deactivate() { }
