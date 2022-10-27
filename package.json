@@ -28,7 +28,7 @@
       "activitybar": [
         {
           "id": "vnc-viewer",
-          "title": "vnc viewer",
+          "title": "VNC Viewer",
           "icon": "media/ftvnc.svg"
         }
       ]
@@ -37,20 +37,24 @@
       "vnc-viewer": [
         {
           "id": "vnc-view",
-          "name": ""
+          "name": "VNC View"
         }
       ]
     },
     "viewsWelcome": [
       {
         "view": "vnc-view",
-        "contents": "[Open vnc viewer](command:vnc-viewer.start)\n[Open vnc viewer in external browser window](command:vnc-viewer.openExternal)\n"
+        "contents": "[Open VNC Viewer](command:vnc-viewer.start)\n[Open VNC Viewer in external browser window](command:vnc-viewer.openExternal)\n"
       }
     ],
     "commands": [
       {
         "command": "vnc-viewer.start",
-        "title": "Open vnc viewer"
+        "title": "Open VNC Viewer"
+      },
+      {
+        "command": "vnc-viewer.openExternal",
+        "title": "Open VNC Viewer in External Browser Window"
       }
     ]
   },
