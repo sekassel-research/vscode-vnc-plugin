@@ -1,7 +1,6 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import * as fs from 'fs';
 
 const WEBVIEW_CONTENT = `<!DOCTYPE html>
 <html>
@@ -35,19 +34,10 @@ const WEBVIEW_CONTENT = `<!DOCTYPE html>
 </body>
 </html>`;
 
-let currentPanel: vscode.WebviewPanel | undefined
+let currentPanel: vscode.WebviewPanel | undefined;
 
 async function getVncUrl(): Promise<string | undefined> {
-	if (!vscode.workspace.workspaceFolders) {
-		return undefined;
-	}
-	// e.g. /home/coder/project
-	let homePath = vscode.workspace.workspaceFolders[0].uri.fsPath;
-	let vncPath = homePath + '/.vnc/vncUrl';
-	let fileBuffer: any = await fs.promises.readFile(vncPath).catch(async (err) => {
-		console.log(err);
-	});
-	return fileBuffer.toString();
+	return process.env.VNC_URL;
 }
 
 export async function activate(context: vscode.ExtensionContext) {
@@ -58,7 +48,7 @@ export async function activate(context: vscode.ExtensionContext) {
 		}
 		const vncUrl = await getVncUrl();
 		if (!vncUrl) {
-			vscode.window.showErrorMessage('Working folder not found, open a folder and try again');
+			vscode.window.showErrorMessage('VNC URL not found');
 			return;
 		}
 
@@ -89,7 +79,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(vscode.commands.registerCommand('vnc-viewer.openExternal', async () => {
 		const vncUrl = await getVncUrl();
 		if (!vncUrl) {
-			vscode.window.showErrorMessage('Working folder not found, open a folder and try again');
+			vscode.window.showErrorMessage('VNC URL not found');
 			return;
 		}
 		vscode.env.openExternal(vscode.Uri.parse(vncUrl));
