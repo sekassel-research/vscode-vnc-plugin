@@ -1,83 +1,83 @@
 {
-  "name": "vnc-viewer",
-  "description": "VNC Viewer for fulib.org",
-  "publisher": "fulib",
-  "author": {
-    "name": "Adrian Kunz",
-    "email": "a.kunz@uni-kassel.de",
-    "url": "https://fulib.org"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/sekassel-research/vscode-vnc-viewer.git"
-  },
-  "version": "0.1.0",
-  "engines": {
-    "vscode": "^1.66.2"
-  },
-  "categories": [
-    "Other"
-  ],
-  "activationEvents": [
-    "onCommand:vnc-viewer.start",
-    "onCommand:vnc-viewer.openExternal"
-  ],
-  "main": "./out/extension.js",
-  "contributes": {
-    "viewsContainers": {
-      "activitybar": [
-        {
-          "id": "vnc-viewer",
-          "title": "VNC Viewer",
-          "icon": "media/ftvnc.svg"
-        }
-      ]
-    },
-    "views": {
-      "vnc-viewer": [
-        {
-          "id": "vnc-view",
-          "name": "VNC View"
-        }
-      ]
-    },
-    "viewsWelcome": [
-      {
-        "view": "vnc-view",
-        "contents": "[Open VNC Viewer](command:vnc-viewer.start)\n[Open VNC Viewer in external browser window](command:vnc-viewer.openExternal)\n"
-      }
-    ],
-    "commands": [
-      {
-        "command": "vnc-viewer.start",
-        "title": "Open VNC Viewer"
-      },
-      {
-        "command": "vnc-viewer.openExternal",
-        "title": "Open VNC Viewer in External Browser Window"
-      }
-    ]
-  },
-  "scripts": {
-    "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
-    "pretest": "npm run compile && npm run lint",
-    "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js"
-  },
-  "devDependencies": {
-    "@types/glob": "^7.2.0",
-    "@types/mocha": "^9.1.1",
-    "@types/node": "16.x",
-    "@types/vscode": "^1.66.2",
-    "@typescript-eslint/eslint-plugin": "^5.31.0",
-    "@typescript-eslint/parser": "^5.31.0",
-    "@vscode/test-electron": "^2.1.5",
-    "eslint": "^8.20.0",
-    "glob": "^8.0.3",
-    "mocha": "^10.0.0",
-    "typescript": "^4.7.4",
-    "vsce": "^2.10.0"
-  }
+	"name": "vnc-viewer",
+	"description": "VNC Viewer for fulib.org",
+	"publisher": "fulib",
+	"author": {
+		"name": "Adrian Kunz",
+		"email": "a.kunz@uni-kassel.de",
+		"url": "https://fulib.org"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/sekassel-research/vscode-vnc-viewer.git"
+	},
+	"version": "0.1.0",
+	"engines": {
+		"vscode": "^1.66.2"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"onCommand:vnc-viewer.start",
+		"onCommand:vnc-viewer.openExternal"
+	],
+	"main": "./out/extension.js",
+	"contributes": {
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "vnc-viewer",
+					"title": "VNC Viewer",
+					"icon": "media/ftvnc.svg"
+				}
+			]
+		},
+		"views": {
+			"vnc-viewer": [
+				{
+					"id": "vnc-view",
+					"name": "VNC View"
+				}
+			]
+		},
+		"viewsWelcome": [
+			{
+				"view": "vnc-view",
+				"contents": "[Open VNC Viewer](command:vnc-viewer.start)\n[Open VNC Viewer in external browser window](command:vnc-viewer.openExternal)\n"
+			}
+		],
+		"commands": [
+			{
+				"command": "vnc-viewer.start",
+				"title": "Open VNC Viewer"
+			},
+			{
+				"command": "vnc-viewer.openExternal",
+				"title": "Open VNC Viewer in External Browser Window"
+			}
+		]
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run compile",
+		"compile": "tsc -p ./",
+		"watch": "tsc -watch -p ./",
+		"pretest": "npm run compile && npm run lint",
+		"lint": "eslint src --ext ts",
+		"test": "node ./out/test/runTest.js"
+	},
+	"devDependencies": {
+		"@types/glob": "^7.2.0",
+		"@types/mocha": "^9.1.1",
+		"@types/node": "16.x",
+		"@types/vscode": "^1.66.2",
+		"@typescript-eslint/eslint-plugin": "^5.31.0",
+		"@typescript-eslint/parser": "^5.31.0",
+		"@vscode/test-electron": "^2.1.5",
+		"eslint": "^8.20.0",
+		"glob": "^8.0.3",
+		"mocha": "^10.0.0",
+		"typescript": "^4.7.4",
+		"vsce": "^2.10.0"
+	}
 }
